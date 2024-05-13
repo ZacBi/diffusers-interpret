@@ -9,13 +9,13 @@ with open('requirements.txt', encoding='utf-8') as f:
 
 setup(
     name='diffusers-interpret',
-    version='0.5.0',
+    version='0.5.1',
     description='diffusers-interpret: model explainability for 🤗 Diffusers',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/JoaoLages/diffusers-interpret',
-    author='Joao Lages',
-    author_email='joaop.glages@gmail.com',
+    url='https://github.com/ZacBi/diffusers-interpret.git',
+    author='Zac Bi',
+    author_email='zaci@outlook.com',
     license='MIT',
     packages=find_packages('src'),
     package_dir={'': 'src'},
