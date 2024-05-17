@@ -3,7 +3,7 @@ from typing import List, Optional, Union, Tuple
 
 import torch
 from PIL.Image import Image
-from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_inpaint import preprocess_mask
+# from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_inpaint import preprocess_mask
 from torch.utils.checkpoint import checkpoint
 from diffusers import StableDiffusionPipeline, LMSDiscreteScheduler, StableDiffusionImg2ImgPipeline, \
     StableDiffusionInpaintPipeline
@@ -294,7 +294,7 @@ class StableDiffusionImg2ImgPipelineExplainer(BasePipelineImg2ImgExplainer, Base
         mask = None
         if mask_image is not None:
             # preprocess mask
-            mask = preprocess_mask(mask_image).to(self.pipe.device)
+            # mask = preprocess_mask(mask_image).to(self.pipe.device)
             mask = torch.cat([mask] * batch_size)
 
             # check sizes
