@@ -50,18 +50,28 @@ class BaseStableDiffusionPipelineExplainer(BasePipelineExplainer):
     def tokenizer(self) -> PreTrainedTokenizerBase:
         return self.pipe.tokenizer
 
-    def get_prompt_tokens_token_ids_and_embeds(self, prompt: Union[str, List[str]]) -> Tuple[
+    def get_prompt_tokens_token_ids_and_embeds(self, prompt: Optional[Union[str, List[str]]] = None, prompt_embeds: Optional[torch.FloatTensor] = None) -> Tuple[
         List[List[str]], BatchEncoding, torch.Tensor]:
-        text_input = self.pipe.tokenizer(
-            prompt,
-            padding="max_length",
-            max_length=self.pipe.tokenizer.model_max_length,
-            truncation=True,
-            return_tensors="pt",
-        )
-        text_embeddings = self.pipe.text_encoder(text_input.input_ids.to(self.pipe.device))[0]
-        tokens = [self.pipe.tokenizer.convert_ids_to_tokens(sample) for sample in text_input['input_ids']]
-        return tokens, text_input, text_embeddings
+        if prompt is None and prompt_embeds is None:
+            raise ValueError("prmopt and prompt_embeds can't all be None")
+
+        text_input = None
+        tokens = None
+        if prompt_embeds is None:
+            text_input = self.pipe.tokenizer(
+                prompt,
+                padding="max_length",
+                max_length=self.pipe.tokenizer.model_max_length,
+                truncation=True,
+                return_tensors="pt",
+            )
+            prompt_embeds = self.pipe.text_encoder(text_input.input_ids.to(self.pipe.device))[0]
+            tokens = [self.pipe.tokenizer.convert_ids_to_tokens(sample) for sample in text_input['input_ids']]
+
+        if tokens is None and prompt_embeds is not None:
+            tokens = [i for i in range(0, prompt_embeds.shape[1])]
+
+        return tokens, text_input, prompt_embeds
 
     def gradient_checkpointing_enable(self) -> None:
         self.pipe.text_encoder.gradient_checkpointing_enable()
@@ -77,8 +87,8 @@ class StableDiffusionPipelineExplainer(BaseStableDiffusionPipelineExplainer):
 
     def _mimic_pipeline_call(
         self,
-        text_input: BatchEncoding,
-        text_embeddings: torch.Tensor,
+        text_input: Optional[BatchEncoding] = None,
+        text_embeddings: Optional[torch.FloatTensor],
         batch_size: int,
         init_image: Optional[torch.FloatTensor] = None,
         mask_image: Optional[Union[torch.FloatTensor, Image]] = None,
@@ -121,7 +131,7 @@ class StableDiffusionPipelineExplainer(BaseStableDiffusionPipelineExplainer):
         do_classifier_free_guidance = guidance_scale > 1.0
         # get unconditional embeddings for classifier free guidance
         if do_classifier_free_guidance:
-            max_length = text_input.input_ids.shape[-1]
+            max_length = text_input.input_ids.shape[-1] if text_input is not None else text_embeddings.shape[1]
             uncond_input = self.pipe.tokenizer(
                 [""] * batch_size, padding="max_length", max_length=max_length, return_tensors="pt"
             )

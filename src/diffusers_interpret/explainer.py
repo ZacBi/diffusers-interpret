@@ -45,7 +45,8 @@ class BasePipelineExplainer(ABC):
 
     def __call__(
         self,
-        prompt: str,
+        prompt: Optional[str] = None,
+        prompt_embeds: Optional[torch.FloatTensor] = None,
         init_image: Optional[Union[torch.FloatTensor, Image]] = None,
         mask_image: Optional[Union[torch.FloatTensor, Image]] = None,
         attribution_method: Union[str, AttributionMethods] = None,
@@ -143,7 +144,7 @@ class BasePipelineExplainer(ABC):
         prompt, init_image, mask_image = self._preprocess_input(prompt=prompt, init_image=init_image, mask_image=mask_image)
 
         # get prompt text embeddings
-        tokens, text_input, text_embeddings = self.get_prompt_tokens_token_ids_and_embeds(prompt=prompt)
+        tokens, text_input, text_embeddings = self.get_prompt_tokens_token_ids_and_embeds(prompt=prompt, prompt_embeds=prompt_embeds)
 
         # Enable gradient, if `n_last_diffusion_steps_to_consider_for_attributions > 0`
         calculate_attributions = n_last_diffusion_steps_to_consider_for_attributions is None \
@@ -342,7 +343,7 @@ class BasePipelineExplainer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_prompt_tokens_token_ids_and_embeds(self, prompt: Union[str, List[str]]) -> Tuple[List[List[str]], BatchEncoding, torch.Tensor]:
+    def get_prompt_tokens_token_ids_and_embeds(self, prompt: Union[str, List[str]], prompt_embeds: Optional[torch.FloatTensor] = None) -> Tuple[List[List[str]], BatchEncoding, torch.Tensor]:
         raise NotImplementedError
 
     @abstractmethod
