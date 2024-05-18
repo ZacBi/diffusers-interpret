@@ -112,6 +112,8 @@ class BasePipelineExplainer(ABC):
             [`PipelineImg2ImgExplainerOutput`] if `init_image is not None` and `explanation_2d_bounding_box=None`
             [`PipelineImg2ImgExplainerForBoundingBoxOutputOutput`] if `init_image is not None` and `explanation_2d_bounding_box is not None`
         """
+        if prompt is None and prompt_embeds is None:
+            raise ValueError('prompt and prompt_embeds can not all be null')
 
         attribution_method = attribution_method or AttributionMethods()
 
@@ -129,13 +131,16 @@ class BasePipelineExplainer(ABC):
                 if not isinstance(v, AttributionAlgorithm):
                     setattr(attribution_method, k, AttributionAlgorithm(v))
 
-        if isinstance(prompt, str):
-            batch_size = 1 # TODO: make compatible with bigger batch sizes
-        elif isinstance(prompt, list) and len(prompt) > 0 and isinstance(prompt[0], str):
-            batch_size = len(prompt)
-            raise NotImplementedError("Passing a list of strings in `prompt` is still not implemented yet.")
-        else:
-            raise ValueError(f"`prompt` has to be of type `str` but is {type(prompt)}")
+        if prompt is not None:
+            if isinstance(prompt, str):
+                batch_size = 1 # TODO: make compatible with bigger batch sizes
+            elif isinstance(prompt, list) and len(prompt) > 0 and isinstance(prompt[0], str):
+                batch_size = len(prompt)
+                raise NotImplementedError("Passing a list of strings in `prompt` is still not implemented yet.")
+            else:
+                raise ValueError(f"`prompt` has to be of type `str` but is {type(prompt)}")
+        elif prompt_embeds is not None:
+            batch_size = prompt_embeds.shape[0]
 
         # TODO: add asserts for out of bounds
         if explanation_2d_bounding_box:

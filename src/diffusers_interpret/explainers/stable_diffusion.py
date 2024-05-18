@@ -69,7 +69,7 @@ class BaseStableDiffusionPipelineExplainer(BasePipelineExplainer):
             tokens = [self.pipe.tokenizer.convert_ids_to_tokens(sample) for sample in text_input['input_ids']]
 
         if tokens is None and prompt_embeds is not None:
-            tokens = [i for i in range(0, prompt_embeds.shape[1])]
+            tokens = [[str(i) for i in range(0, prompt_embeds.shape[1])]]
 
         return tokens, text_input, prompt_embeds
 
@@ -88,8 +88,8 @@ class StableDiffusionPipelineExplainer(BaseStableDiffusionPipelineExplainer):
     def _mimic_pipeline_call(
         self,
         text_input: Optional[BatchEncoding] = None,
-        text_embeddings: Optional[torch.FloatTensor],
-        batch_size: int,
+        text_embeddings: Optional[torch.FloatTensor] = None,
+        batch_size: int = 1,
         init_image: Optional[torch.FloatTensor] = None,
         mask_image: Optional[Union[torch.FloatTensor, Image]] = None,
         height: Optional[int] = 512,
@@ -104,7 +104,8 @@ class StableDiffusionPipelineExplainer(BaseStableDiffusionPipelineExplainer):
         return_dict: bool = True,
         run_safety_checker: bool = True,
         n_last_diffusion_steps_to_consider_for_attributions: Optional[int] = None,
-        get_images_for_all_inference_steps: bool = False
+        get_images_for_all_inference_steps: bool = False,
+        **kwargs
     ) -> Union[
         BaseMimicPipelineCallOutput,
         Tuple[Union[List[Image], torch.Tensor], Optional[Union[List[List[Image]], List[torch.Tensor]]], Optional[
