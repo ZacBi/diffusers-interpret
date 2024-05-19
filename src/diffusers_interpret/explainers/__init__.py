@@ -1,3 +1,4 @@
 from .latent_diffusion import LDMTextToImagePipelineExplainer
 from .stable_diffusion import StableDiffusionPipelineExplainer, StableDiffusionImg2ImgPipelineExplainer, \
     StableDiffusionInpaintPipelineExplainer
+from .custom import StableDiffusionPipelineDetExplainer
