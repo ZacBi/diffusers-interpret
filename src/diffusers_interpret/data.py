@@ -180,6 +180,7 @@ class AttributionAlgorithm(ExplicitEnum):
     MAX_GRAD = "max_grad"
     MEAN_GRAD = "mean_grad"
     MIN_GRAD = "min_grad"
+    GRAD_X_INPUT_NO_NORM = "grad_x_input_no_norm"
 
 
 @dataclass

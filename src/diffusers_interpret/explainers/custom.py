@@ -72,6 +72,10 @@ class StableDiffusionPipelineDetExplainer(StableDiffusionPipelineExplainer):
             .numpy()
         )
 
+        # 直接传入embeddings时, 不存在tokens, 需要mock
+        if tokens is None:
+            tokens = [[str(i) for i in range(raw_embeds.shape[1])]]
+
         output = self._post_process_token_attributions(
             output=output,
             tokens=tokens,
@@ -182,7 +186,6 @@ class StableDiffusionPipelineDetExplainer(StableDiffusionPipelineExplainer):
         # Aggregate
         aggregated_grads = []
         for grad, inp, attr_alg in zip(grads, input_embeds, attribution_algorithms):
-
             if attr_alg == AttributionAlgorithm.GRAD_X_INPUT:
                 aggregated_grads.append(torch.norm(grad * inp, dim=-1))
             elif attr_alg == AttributionAlgorithm.MAX_GRAD:
@@ -191,6 +194,8 @@ class StableDiffusionPipelineDetExplainer(StableDiffusionPipelineExplainer):
                 aggregated_grads.append(grad.abs().mean(-1).values)
             elif attr_alg == AttributionAlgorithm.MIN_GRAD:
                 aggregated_grads.append(grad.abs().min(-1).values)
+            elif attr_alg == AttributionAlgorithm.GRAD_X_INPUT_NO_NORM:
+                aggregated_grads.append(grad * inp)
             else:
                 raise NotImplementedError(
                     f"aggregation type `{attr_alg}` not implemented"

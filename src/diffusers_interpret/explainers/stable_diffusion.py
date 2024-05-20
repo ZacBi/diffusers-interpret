@@ -68,9 +68,6 @@ class BaseStableDiffusionPipelineExplainer(BasePipelineExplainer):
             prompt_embeds = self.pipe.text_encoder(text_input.input_ids.to(self.pipe.device))[0]
             tokens = [self.pipe.tokenizer.convert_ids_to_tokens(sample) for sample in text_input['input_ids']]
 
-        if tokens is None and prompt_embeds is not None:
-            tokens = [[str(i) for i in range(0, prompt_embeds.shape[1])]]
-
         return tokens, text_input, prompt_embeds
 
     def gradient_checkpointing_enable(self) -> None:
