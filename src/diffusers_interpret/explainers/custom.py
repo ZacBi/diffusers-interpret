@@ -59,6 +59,7 @@ class StableDiffusionPipelineDetExplainer(StableDiffusionPipelineExplainer):
         if raw_embeds is not None:
             input_embeds = (raw_embeds,)
 
+        # hard code to process bfloat16
         token_attributions = (
             self.gradients_attribution(
                 pred_logits=output.image,
@@ -68,6 +69,7 @@ class StableDiffusionPipelineDetExplainer(StableDiffusionPipelineExplainer):
                 target_cls_id=target_cls_id
             )[0]
             .detach()
+            .half()
             .cpu()
             .numpy()
         )
@@ -155,13 +157,13 @@ class StableDiffusionPipelineDetExplainer(StableDiffusionPipelineExplainer):
         # Construct tuple of scalar tensors with all `pred_logits`
         # The code below is equivalent to `tuple_of_pred_logits = tuple(torch.flatten(pred_logits))`,
         #  but for some reason the gradient calculation is way faster if the tensor is flattened like this
-        tuple_of_pred_logits = []
-        for px, mx in zip(pred_logits, traget_mask):
-            for py, my in zip(px, mx):
-                for pz, mz in zip(py, my):
-                    if mz:
-                        tuple_of_pred_logits.append(pz)
-        tuple_of_pred_logits = tuple(tuple_of_pred_logits)
+        # tuple_of_pred_logits = []
+        # for px, mx in zip(pred_logits, traget_mask):
+        #     for py, my in zip(px, mx):
+        #         for pz, mz in zip(py, my):
+        #             if mz:
+        #                 tuple_of_pred_logits.append(pz)
+        tuple_of_pred_logits = tuple(pred_logits[traget_mask])
 
         # get the sum of back-prop gradients for all predictions with respect to the inputs
         if torch.is_autocast_enabled():

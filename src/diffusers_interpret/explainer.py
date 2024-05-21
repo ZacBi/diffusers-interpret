@@ -49,6 +49,7 @@ class BasePipelineExplainer(ABC):
         prompt_embeds: Optional[torch.FloatTensor] = None,
         init_image: Optional[Union[torch.FloatTensor, Image]] = None,
         mask_image: Optional[Union[torch.FloatTensor, Image]] = None,
+        # attribution_method: Union[str, AttributionMethods] = None,
         attribution_method: Union[str, AttributionMethods] = None,
         explanation_2d_bounding_box: Optional[Tuple[Tuple[int, int], Tuple[int, int]]] = None,
         consider_special_tokens: bool = False,
@@ -114,7 +115,7 @@ class BasePipelineExplainer(ABC):
         """
         if prompt is None and prompt_embeds is None:
             raise ValueError('prompt and prompt_embeds can not all be null')
-
+        attribution_method = "grad_x_input_no_norm"
         attribution_method = attribution_method or AttributionMethods()
 
         if isinstance(attribution_method, str):
@@ -516,6 +517,7 @@ class BasePipelineImg2ImgExplainer(BasePipelineExplainer):
             output=output,
             tokens=tokens,
             token_attributions=token_attributions,
+
             consider_special_tokens=consider_special_tokens,
             clean_token_prefixes_and_suffixes=clean_token_prefixes_and_suffixes
         )

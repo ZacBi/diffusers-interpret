@@ -186,4 +186,6 @@ class AttributionAlgorithm(ExplicitEnum):
 @dataclass
 class AttributionMethods:
     tokens_attribution_method: Union[str, AttributionAlgorithm] = AttributionAlgorithm.GRAD_X_INPUT
+    # tokens_attribution_method: Union[str, AttributionAlgorithm] = AttributionAlgorithm.GRAD_X_INPUT_NO_NORM
     pixels_attribution_method: Optional[Union[str, AttributionAlgorithm]] = AttributionAlgorithm.MAX_GRAD
+    # pixels_attribution_method: Union[str, AttributionAlgorithm] = AttributionAlgorithm.GRAD_X_INPUT_NO_NORM

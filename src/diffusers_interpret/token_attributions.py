@@ -1,5 +1,6 @@
 from typing import Tuple, List, Any, Union
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class TokenAttributions(list):
@@ -10,7 +11,7 @@ class TokenAttributions(list):
         # Calculate normalized
         total = sum([attr for _, attr in token_attributions])
         self.normalized = [
-            (token, round(100 * attr / total, 3))
+            (token, np.around(100 * attr / total, 3))
             for token, attr in token_attributions
         ]
 
