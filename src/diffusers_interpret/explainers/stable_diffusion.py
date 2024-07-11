@@ -81,7 +81,6 @@ class BaseStableDiffusionPipelineExplainer(BasePipelineExplainer):
 
 class StableDiffusionPipelineExplainer(BaseStableDiffusionPipelineExplainer):
     pipe: StableDiffusionPipeline
-
     def _mimic_pipeline_call(
         self,
         text_input: Optional[BatchEncoding] = None,

@@ -28,8 +28,10 @@ class StableDiffusionPipelineDetExplainer(StableDiffusionPipelineExplainer):
         det_model=None,
     ) -> None:
         super().__init__(pipe, verbose, gradient_checkpointing)
-        self.det_model = det_model
-
+        self.det_model = det_model # EVA02
+        torch.manual_seed(1337)  # 任意整数作为种子
+        torch.cuda.manual_seed(1337)  # 如果使用 CUDA
+        torch.cuda.manual_seed_all(1337)  # 如果使用多个 GPU
     def _get_attributions(
         self,
         output: Union[PipelineExplainerOutput, PipelineExplainerForBoundingBoxOutput],
